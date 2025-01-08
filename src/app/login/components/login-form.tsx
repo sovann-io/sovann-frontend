@@ -1,15 +1,41 @@
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+"use client"
+import {cn} from "@/lib/utils"
+import {Button} from "@/components/ui/button"
+import {Input} from "@/components/ui/input"
+import {Label} from "@/components/ui/label"
 import Link from "next/link";
+import {signIn, SignInResponse} from "next-auth/react";
+import React, {FormEvent, useState} from "react";
+import {useRouter} from "next/navigation";
 
 export function LoginForm({
                               className,
                               ...props
                           }: React.ComponentPropsWithoutRef<"form">) {
+
+    const router = useRouter()
+    const [username, setUsername] = useState("");
+    const [password, setPassword] = useState("");
+
+    const handleSubmit = async (e: FormEvent) => {
+        e.preventDefault();
+        // signIn will call the CredentialsProvider’s authorize() method on the server side
+        const result: any = await signIn("credentials", {
+            username,
+            password,
+            redirect: false, // set to true if you want next-auth to redirect after sign-in
+        });
+        if (result?.error) {
+            console.error("Failed to sign in:", result.error);
+        } else {
+            router.push("/")
+            console.log("Sign in successful:", result);
+            // handle success, e.g. redirect or show success message
+        }
+    };
+
     return (
-        <form className={cn("flex flex-col gap-6", className)} {...props}>
+        <form className={cn("flex flex-col gap-6", className)} {...props} onSubmit={handleSubmit}>
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Login to your account</h1>
                 <p className="text-balance text-sm text-muted-foreground">
@@ -19,7 +45,10 @@ export function LoginForm({
             <div className="grid gap-6">
                 <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
-                    <Input id="email" type="email" placeholder="m@example.com" required />
+                    <Input id="email" type="email" placeholder="m@example.com"
+                           value={username}
+                           onChange={(e) => setUsername(e.target.value)}
+                           required/>
                 </div>
                 <div className="grid gap-2">
                     <div className="flex items-center">
@@ -31,12 +60,16 @@ export function LoginForm({
                             Forgot your password?
                         </a>
                     </div>
-                    <Input id="password" type="password" required />
+                    <Input id="password" type="password" required
+                           value={password}
+                           onChange={(e) => setPassword(e.target.value)}
+                    />
                 </div>
                 <Button type="submit" className="w-full">
                     Login
                 </Button>
-                <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+                <div
+                    className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
           <span className="relative z-10 bg-background px-2 text-muted-foreground">
             Or continue with
           </span>
