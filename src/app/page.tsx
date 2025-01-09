@@ -1,25 +1,16 @@
 "use client"
 import React from 'react';
-import {Button} from '@/components/ui/button';
+import { Button } from '@/components/ui/button';
 import Link from "next/link";
-import {useSession} from "next-auth/react";
 
 export default function Home() {
-
-    const {status} = useSession()
-    if (status == 'authenticated') {
-        return <>
-            Dashboard
-        </>
-    }
-
     return (
         <div className="min-h-screen bg-background text-foreground">
-            <Navbar/>
-            <Hero/>
-            <Features/>
-            <CTA/>
-            <Footer/>
+            <Navbar />
+            <Hero />
+            <Features />
+            <CTA />
+            <Footer />
         </div>
     );
 }
@@ -42,7 +33,7 @@ const Navbar = () => {
             <div className="space-x-4">
                 <Button variant="ghost">Features</Button>
                 <Button variant="ghost">Pricing</Button>
-                <Link href="/login"><Button>Sign in</Button></Link>
+                <Link href="/auth/login"><Button>Sign in</Button></Link>
                 <Button>Sign Up</Button>
             </div>
         </nav>
@@ -66,15 +57,15 @@ const Features = () => {
         <section className="py-16">
             <h2 className="text-3xl font-bold text-center mb-10">Why Choose Sovann?</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-10">
-                <FeatureCard title="Feature One" description="Innovative tools to streamline your workflow."/>
-                <FeatureCard title="Feature Two" description="Seamless integration with your existing systems."/>
-                <FeatureCard title="Feature Three" description="24/7 support to keep your business running smoothly."/>
+                <FeatureCard title="Feature One" description="Innovative tools to streamline your workflow." />
+                <FeatureCard title="Feature Two" description="Seamless integration with your existing systems." />
+                <FeatureCard title="Feature Three" description="24/7 support to keep your business running smoothly." />
             </div>
         </section>
     );
 }
 
-const FeatureCard = ({title, description}) => {
+const FeatureCard = ({ title, description }: { title: string, description: string }) => {
     return (
         <div className="p-6 border rounded-lg shadow-sm text-center">
             <h3 className="text-xl font-semibold mb-4">{title}</h3>

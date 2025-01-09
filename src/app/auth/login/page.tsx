@@ -1,5 +1,7 @@
-import {SailboatIcon} from "lucide-react"
-import {LoginForm} from "@/app/login/components/login-form";
+"use client"
+
+import { SailboatIcon } from "lucide-react"
+import { LoginForm } from "@/app/auth/login/components/login-form";
 
 export default function LoginPage() {
     return (
@@ -9,19 +11,19 @@ export default function LoginPage() {
                     <a href="#" className="flex items-center gap-2 font-medium">
                         <div
                             className="flex h-6 w-6 items-center justify-center rounded-md bg-primary text-primary-foreground">
-                            <SailboatIcon className="size-4"/>
+                            <SailboatIcon className="size-4" />
                         </div>
                         Sovann.
                     </a>
                 </div>
                 <div className="flex flex-1 items-center justify-center">
                     <div className="w-full max-w-xs">
-                        <LoginForm/>
+                        <LoginForm />
                     </div>
                 </div>
             </div>
             <div className="relative hidden bg-muted lg:block bg-center bg-no-repeat"
-                 style={{backgroundImage: `url(/images/undraw_ordinary-day_ak4e.svg)`, backgroundSize: '80%'}}>
+                style={{ backgroundImage: `url(/images/undraw_ordinary-day_ak4e.svg)`, backgroundSize: '80%' }}>
             </div>
         </div>
     )

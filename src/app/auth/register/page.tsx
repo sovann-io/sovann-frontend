@@ -1,5 +1,5 @@
-import {SailboatIcon} from "lucide-react";
-import {RegistrationForm} from "@/app/register/components/registration-form";
+import { SailboatIcon } from "lucide-react";
+import { RegistrationForm } from "@/app/auth/register/components/registration-form";
 
 export default function RegistrationPage() {
     return (

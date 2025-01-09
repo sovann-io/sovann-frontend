@@ -1,9 +1,7 @@
 'use client'
-import type {Metadata} from "next";
-import {Geist, Geist_Mono} from "next/font/google";
+import type { Metadata } from "next";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import {SessionProvider} from "next-auth/react";
-import AuthWrapper from "@/components/shared/AuthWrapper";
 
 const geistSans = Geist({
     variable: "--font-geist-sans",
@@ -21,21 +19,17 @@ const geistMono = Geist_Mono({
 // };
 
 export default function RootLayout({
-                                       children,
-                                   }: Readonly<{
+    children,
+}: Readonly<{
     children: React.ReactNode;
 }>) {
     return (
         <html lang="en">
-        <body
-            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-        <SessionProvider>
-            <AuthWrapper>
+            <body
+                className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+            >
                 {children}
-            </AuthWrapper>
-        </SessionProvider>
-        </body>
+            </body>
         </html>
     );
 }
