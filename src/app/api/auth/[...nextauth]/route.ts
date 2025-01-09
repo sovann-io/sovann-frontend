@@ -1,6 +1,8 @@
 import NextAuth, {DefaultSession} from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {NextAuthOptions} from "next-auth";
+import GitHubProvider from "next-auth/providers/github";
+import GoogleProvider from "next-auth/providers/google";
 
 interface AuthResponse {
     access_token: string;
@@ -36,7 +38,7 @@ export const authOptions: NextAuthOptions = {
                 username: {label: "Username", type: "text", placeholder: "john_doe"},
                 password: {label: "Password", type: "password"},
             },
-            async authorize(credentials) {
+            async authorize(credentials: any) {
                 if (!credentials?.username || !credentials?.password) {
                     throw new Error('Please provide username and password');
                 }
@@ -46,8 +48,8 @@ export const authOptions: NextAuthOptions = {
                     username: credentials.username,
                     password: credentials.password,
                     scope: '',
-                    client_id: 'your_client_id', // Replace with your actual client ID
-                    client_secret: 'your_client_secret', // Replace with your actual client secret
+                    client_id: 'your_client_id',
+                    client_secret: 'your_client_secret',
                 });
 
                 try {
@@ -67,14 +69,12 @@ export const authOptions: NextAuthOptions = {
 
                     const user: AuthResponse = await response.json();
 
-                    // Important: NextAuth expects a user object with at least an 'id' property.
-                    // Adapt this to your API response structure.
                     if (user && user.access_token) {
                         return {
                             id: credentials.username, ...user
-                        }; // Successful authentication
+                        };
                     } else {
-                        return null; // Authentication failed
+                        return null;
                     }
                 } catch (error) {
                     console.error("Authentication error", error);
@@ -82,42 +82,45 @@ export const authOptions: NextAuthOptions = {
                 }
             },
         }),
+        GitHubProvider({
+            clientId: process.env.GITHUB_CLIENT_ID,
+            clientSecret: process.env.GITHUB_CLIENT_SECRET,
+        }),
+        GoogleProvider({
+            clientId: process.env.GOOGLE_CLIENT_ID,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET
+        })
     ],
-    // Configure to use JWT so we can store the token in the session
     session: {
         strategy: "jwt",
     },
-    // Add your own secret (must be set in production via environment variables)
     secret: process.env.NEXTAUTH_SECRET,
 
     callbacks: {
-        /**
-         * When a user signs in, NextAuth will create a JWT.
-         * We can persist the accessToken from the FastAPI response in the token object
-         */
-        async jwt({token, user}) {
-            if (user?.access_token) {
-                token.accessToken = user.access_token;
+        async jwt({token, user, account}: any) {
+            // Handle CredentialsProvider
+            if (account?.provider === 'credentials' && user?.access_token) {
+                token.accessToken = user.access_token; // Use `access_token` for credentials
             }
+            // Handle other providers (e.g., GitHub)
+            else if (account?.provider && account.provider !== 'credentials') {
+                token.accessToken = account.access_token || token.accessToken; // Use access_token if provided
+            }
+            token.provider = account?.provider || token.provider; // Track provider type
             return token;
         },
-        /**
-         * This callback makes the token accessible via the session.
-         */
-        async session({session, token}) {
+        async session({session, token}: any) {
             if (token?.accessToken) {
                 session.user = session.user || {};
                 session.user.accessToken = token.accessToken;
             }
             return session;
         },
+        async redirect({url, baseUrl}) {
+            return baseUrl;
+        },
     }
 };
 
-/**
- * NextAuth in App Router needs to export the route handlers:
- * - GET for fetching session
- * - POST for sign-in
- */
 const handler = NextAuth(authOptions);
 export {handler as GET, handler as POST};
