@@ -13,13 +13,13 @@ export function middleware(request: NextRequest) {
 
     // Redirect to login if accessing protected route without token
     if (isProtectedRoute && !token) {
-        const loginUrl = new URL('/login', request.url)
+        const loginUrl = new URL('/auth/login', request.url)
         loginUrl.searchParams.set('from', request.nextUrl.pathname)
         return NextResponse.redirect(loginUrl)
     }
 
     // Redirect to dashboard if accessing login page with token
-    if (request.nextUrl.pathname === '/login' && token) {
+    if (request.nextUrl.pathname === '/auth/login' && token) {
         return NextResponse.redirect(new URL('/dashboard', request.url))
     }
 
@@ -28,7 +28,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
     matcher: [
-        '/dashboard/:path*',
+        // '/dashboard/:path*',
         '/profile/:path*',
         '/settings/:path*',
         '/login',
