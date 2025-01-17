@@ -1,12 +1,11 @@
 // hooks/useAuth.ts
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useAuthStore } from '@/stores/use-auth-store'
 import { ACCESS_TOKEN } from '@/constants/auth'
 
 export const useAuth = (requireAuth: boolean = true) => {
     const router = useRouter()
-    const [isInitialized, setIsInitialized] = useState(false)
     const {
         isAuthenticated,
         isLoading,

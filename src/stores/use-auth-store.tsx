@@ -2,7 +2,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import axios from 'axios'
-import { ACCESS_TOKEN, API_BASE_URL, GITHUB_AUTH_URL, GOOGLE_AUTH_URL } from '@/constants/auth'
+import { ACCESS_TOKEN, API_BASE_URL, AUTH_BASE_URL, GITHUB_AUTH_URL, GOOGLE_AUTH_URL } from '@/constants/auth'
 
 interface User {
   id: string
@@ -88,7 +88,7 @@ export const useAuthStore = create<AuthState>()(
         if (!accessToken) return
 
         try {
-          const { data } = await axios.get(API_BASE_URL + '/users/me', {
+          const { data } = await axios.get(AUTH_BASE_URL + '/users/me', {
             headers: { Authorization: `Bearer ${accessToken}` },
           })
           set({ user: data, isAuthenticated: true })

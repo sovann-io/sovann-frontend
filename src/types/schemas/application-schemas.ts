@@ -3,9 +3,8 @@ import { z } from "zod";
 export const applicationFormSchema = z.object({
     app_name: z.string().min(1, "App name is required"),
     project_id: z.string().uuid("Invalid project ID"),
-    node_id: z.string().uuid("Invalid node ID"),
     description: z.string().optional(),
-    deployed_version: z.number().min(0),
+    deployed_version: z.string(),
     not_expose_as_web_app: z.boolean(),
     has_persistent_data: z.boolean(),
     has_default_subdomain_ssl: z.boolean(),
@@ -18,7 +17,8 @@ export const applicationFormSchema = z.object({
     app_deploy_token_enabled: z.boolean(),
     app_deploy_token: z.string().optional(),
     is_app_building: z.boolean(),
-    is_instant_building: z.boolean(),
+    is_instant_deploy: z.boolean(),
+    scheduled_deploy_at: z.string(),
     http_auth_user: z.string().optional(),
     http_auth_password: z.string().optional(),
     dockerfile_content: z.string().optional(),
@@ -36,8 +36,8 @@ export const applicationFormSchema = z.object({
     command: z.string().nullable(),
     env_vars: z.array(
         z.object({
-            key: z.string().min(1),
-            value: z.string().min(1),
+            key: z.string(),
+            value: z.string(),
             is_secret: z.boolean(),
         })
     ),
@@ -54,7 +54,7 @@ export const applicationFormSchema = z.object({
         z.object({
             key: z.string(),
             value: z.string(),
-        })
+        })     
     ),
 });
 
