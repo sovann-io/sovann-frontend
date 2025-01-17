@@ -35,10 +35,10 @@ export default function RootLayout({
     return (
         <html
             lang='en'
-            className={`${lato.className}`}
+            className={`${lato.className} dark`}
             suppressHydrationWarning={true}
         >
-            <body className={'overflow-hidden'}>
+            <body className={'overflow-scroll'}>
                 <NextTopLoader
                     showSpinner={false}
                     // color={'#aaa'}
