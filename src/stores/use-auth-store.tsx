@@ -3,6 +3,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import axios from 'axios'
 import { ACCESS_TOKEN, API_BASE_URL, AUTH_BASE_URL, GITHUB_AUTH_URL, GOOGLE_AUTH_URL } from '@/constants/auth'
+import localforage from 'localforage'
 
 interface User {
   id: string

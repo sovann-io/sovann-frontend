@@ -21,9 +21,11 @@ import DashboardPage from "@/app/dashboard/page";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AvatarImage } from "@radix-ui/react-avatar";
-import ProjectServiceTable from "@/components/project-overview/table";
+import ProjectServiceTable from "@/components/project-overview/project-service-table";
 import { getApplicationListService } from "@/services/application-service";
 import { ApplicationItem } from "@/types/application-item";
+import Link from "next/link";
+import { addNewItems } from "@/constants/add-new";
 
 const generateScheduledDeployAt = (): string => {
     const now = new Date();
@@ -50,14 +52,20 @@ export default function ProjectOverviewPage() {
     useEffect(() => {
         async function getApplicationList() {
             setLoading(true);
-            const response = await getApplicationListService()
-            if (response.success === true) {
-                const appItems: ApplicationItem[] = []
-                response.data.forEach((app: ApplicationItem) => {
-                    appItems.push(app)
-                })
-                setAppList(appItems)
-                console.log(appItems)
+            try {
+                const response = await getApplicationListService()
+                if (response.success === true) {
+                    const appItems: ApplicationItem[] = []
+                    response.data.forEach((app: ApplicationItem) => {
+                        appItems.push(app)
+                    })
+                    setAppList(appItems)
+                    console.log(appItems)
+                }
+            } catch (error) {
+                if ((error as any).status === 401) {
+                    toast.error("You need to be logged in to view this page");
+                }
             }
             setLoading(false);
         }
@@ -119,36 +127,32 @@ export default function ProjectOverviewPage() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-44">
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
-                                        <FolderKanban />
-                                        <span className="mx-4">Projects</span>
-                                    </DropdownMenuItem>
+                                    {addNewItems.slice(0, 1).map((item, index) => (
+                                        <DropdownMenuItem key={index}>
+                                            {item.icon}
+                                            <Link href={item.href} className="mx-4">
+                                                {item.label}
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    ))}
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
-                                    <DropdownMenuItem>
-                                        <LayoutTemplate />
-                                        <span className="mx-4">Static</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Database />
-                                        <span className="mx-4">MySQL</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Database />
-                                        <span className="mx-4">PostgreSQL</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <SquareStack />
-                                        <span className="mx-4">Redis</span>
-                                    </DropdownMenuItem>
+                                    {addNewItems.slice(1).map((item, index) => (
+                                        <DropdownMenuItem key={index + 1}>
+                                            {item.icon}
+                                            <Link href={item.href} className="mx-4">
+                                                {item.label}
+                                            </Link>
+                                        </DropdownMenuItem>
+                                    ))}
                                 </DropdownMenuGroup>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
                 </div>
                 <div>
-                    <ProjectServiceTable 
+                    <ProjectServiceTable
                         data={appList}
                         loading={loading}
                     />

@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useTableListContext } from '@/providers/tanstack-table-provider'
 import { ApplicationItem } from '@/types/application-item'
-import { toast } from 'sonner'
+import { LogsIcon } from 'lucide-react'
 
 interface DataTableRowActionsProps {
   row: Row<ApplicationItem>
@@ -35,12 +35,25 @@ export function DataTableRowActions({ row }: DataTableRowActionsProps) {
         <DropdownMenuContent align='end' className='w-[100px]'>
           <DropdownMenuItem
             onClick={() => {
-              toast.info('TODO: viewing service')
+              setCurrentRow(row.original)
+              setOpen('view')
             }}
           >
             View
             <DropdownMenuShortcut>
               <IconEye size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            onClick={() => {
+              setCurrentRow(row.original)
+              setOpen('log')
+            }}
+          >
+            Log
+            <DropdownMenuShortcut>
+              <LogsIcon size={16} />
             </DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuSeparator />

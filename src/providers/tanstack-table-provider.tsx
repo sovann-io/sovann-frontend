@@ -1,6 +1,6 @@
 import React from 'react'
 
-export type TableListDialogType = 'edit' | 'delete'
+export type TableListDialogType = 'view' | 'edit' | 'delete' | 'log'
 
 interface TableListContextType<TData> {
     open: TableListDialogType | null

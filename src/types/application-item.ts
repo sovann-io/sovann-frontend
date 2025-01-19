@@ -1,7 +1,15 @@
+import { EnvVarItem, OptionItem, PortItem } from "./sub-app-item";
+
 export interface ApplicationItem {
     app_deploy_token: string;
     app_deploy_token_enabled: boolean;
     app_name: string;
+    created_at?: string
+    updated_at?: string
+    iphostname: {
+        hostname: string,
+        ip: string,
+    }
     command: string | null;
     custom_nginx_config: string;
     deployed_version: string;
@@ -24,4 +32,7 @@ export interface ApplicationItem {
     scheduled_deploy_at: string | null;
     status: string;
     websocket_support: boolean;
+    options: [OptionItem],
+    ports: [PortItem],
+    env_vars: [EnvVarItem]
 }

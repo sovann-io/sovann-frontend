@@ -33,7 +33,7 @@ export const applicationFormSchema = z.object({
         ssh_key: z.string().nullable(),
         provider: z.string().nullable(),
     }).nullable(),
-    command: z.string().nullable(),
+    container_command: z.string().nullable(),
     env_vars: z.array(
         z.object({
             key: z.string(),

@@ -7,19 +7,18 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { Checkbox } from "@/components/ui/checkbox";
 import DashboardPage from "@/app/dashboard/page";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DateTimePicker } from "@/components/shared/date-time-picker";
 import { Button } from "@/components/ui/button";
-import { applicationFormSchema, ApplicationFormValues } from "@/types/schemas/application-schemas";
+import { ApplicationFormValues } from "@/types/schemas/application-schemas";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/use-auth";
 import axios from 'axios';
 import { API_BASE_URL } from "@/constants/auth";
 import { generateScheduledDeployAt, SCHEDULE_OFFSET } from "@/lib/datetime";
 
-const CreateMySQL = () => {
+const CreatePostgreSQL = () => {
     const { accessToken } = useAuth();
     const [date, setDate] = useState<Date | undefined>(new Date());
     const [isScheduleEnabled, setIsScheduleEnabled] = useState(false);
@@ -59,12 +58,12 @@ const CreateMySQL = () => {
             env_vars: Array(4).fill({ key: "", value: "", is_secret: false }),
             volumes: [],
             ports: [{
-                "container_port": 3306,
-                "host_port": 3311,
+                "container_port": 5432,
+                "host_port": 5432,
                 "protocol": "tcp",
                 "publish_mode": "string"
             }],
-            options: [{ key: "service_type", value: "db_mysql" }, { key: "tag", value: "latest" }],
+            options: [{ key: "service_type", value: "db_postgresql" }, { key: "tag", value: "latest" }],
         },
     });
 
@@ -101,39 +100,33 @@ const CreateMySQL = () => {
 
     return (
         <DashboardPage>
-            <DatabaseLayout title="Create MySQL Database">
+            <DatabaseLayout title="Create PostgreSQL Database">
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid grid-cols-1 gap-8 space-y-4">
                         {[
                             {
                                 label: "Name",
-                                placeholder: "example-mysql-name",
-                                description: "A unique name for your MySQL instance.",
+                                placeholder: "example-postgresql-name",
+                                description: "A unique name for your PostgreSQL instance",
                                 field: "app_name",
                             },
                             {
                                 label: "Database",
                                 placeholder: "randomly generated unless specified",
-                                description: "The MySQL dbname",
-                                onChange: (e: any) => handleEnvVarChange(0, "MYSQL_DATABASE", e.target.value),
+                                description: "The PostgreSQL dbname",
+                                onChange: (e: any) => handleEnvVarChange(0, "POSTGRESQL_DB", e.target.value),
                             },
                             {
                                 label: "User",
                                 placeholder: "randomly generated unless specified",
-                                description: "The MySQL user",
-                                onChange: (e: any) => handleEnvVarChange(1, "MYSQL_USER", e.target.value),
+                                description: "The PostgreSQL user",
+                                onChange: (e: any) => handleEnvVarChange(1, "POSTGRESQL_USER", e.target.value),
                             },
                             {
                                 label: "Password",
                                 placeholder: "randomly generated unless specified",
-                                description: "The MySQL password",
-                                onChange: (e: any) => handleEnvVarChange(2, "MYSQL_PASSWORD", e.target.value),
-                            },
-                            {
-                                label: "Root Password",
-                                placeholder: "randomly generated unless specified",
-                                description: "The MySQL root password",
-                                onChange: (e: any) => handleEnvVarChange(3, "MYSQL_ROOT_PASSWORD", e.target.value),
+                                description: "The PostgreSQL password",
+                                onChange: (e: any) => handleEnvVarChange(2, "POSTGRESQL_PASSWORD", e.target.value),
                             },
                         ].map(({ label, placeholder, description, field, onChange }, idx) => (
                             <div key={idx} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
@@ -153,7 +146,7 @@ const CreateMySQL = () => {
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
                             <div>
                                 <Label className="text-base font-medium text-gray-900 dark:text-gray-300">Version</Label>
-                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">The MySQL version</p>
+                                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">The PostgreSQL version</p>
                             </div>
                             <Select
                                 onValueChange={(value) => setValue("options.1", { key: "tag", value })}
@@ -205,6 +198,27 @@ const CreateMySQL = () => {
                                 />
                             </div>
                         </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
+                            <div>
+                                <Label className="text-base font-medium text-gray-900 dark:text-gray-300">Schedule</Label>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                                <Checkbox
+                                    id="terms"
+                                    checked={isScheduleEnabled}
+                                    onCheckedChange={(checked) => {
+                                        setIsScheduleEnabled(checked === true);
+                                        if (!checked) {
+                                            setDate(undefined);
+                                            setValue("scheduled_deploy_at", generateScheduledDeployAt());
+                                        }
+                                    }}
+                                />
+                                <label htmlFor="terms" className="text-sm font-medium leading-none">
+                                    Enable automatic instance creation
+                                </label>
+                            </div>
+                        </div>
                         <div className="items-center">
                             <Button type="submit" className="px-8 h-full">
                                 Create Database
@@ -217,4 +231,4 @@ const CreateMySQL = () => {
     );
 };
 
-export default CreateMySQL;
+export default CreatePostgreSQL;
