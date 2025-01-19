@@ -10,7 +10,8 @@ export interface ApplicationItem {
         hostname: string,
         ip: string,
     }
-    command: string | null;
+    container_command: string | null;
+    service_type: string | null;
     custom_nginx_config: string;
     deployed_version: string;
     description: string;

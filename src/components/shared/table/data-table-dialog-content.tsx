@@ -3,6 +3,8 @@ import { Dialog, DialogContent, DialogTitle, DialogClose } from "@/components/ui
 import { Button } from "@/components/ui/button";
 import { TableListDialogType } from "@/providers/tanstack-table-provider";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import * as VisuallyHidden from "@radix-ui/react-visually-hidden";
+import { SheetDescription } from "@/components/ui/sheet";
 
 interface DataTableDialogContentProps {
     children: React.ReactNode;
@@ -15,11 +17,14 @@ const DataTableDialogContent = ({ children, open, setOpen, onConfirmDelete }: Da
     return (
         <>
             <Dialog open={open === 'log'} onOpenChange={() => { setOpen(null) }}>
-                <DialogContent className="w-full">
+                <DialogContent className="max-w-fit" aria-labelledby="contents" aria-describedby="contents">
+                    <VisuallyHidden.Root>
+                        <SheetDescription>Log Information</SheetDescription>
+                    </VisuallyHidden.Root>
                     <DialogHeader>
-                        <DialogTitle>Information</DialogTitle>
+                        <DialogTitle>Container Log</DialogTitle>
                     </DialogHeader>
-                    <div className="flex items-center space-x-2">
+                    <div className="flex items-center space-x-2" aria-describedby="contents">
                         {children}
                     </div>
                     <DialogFooter className="sm:justify-start">

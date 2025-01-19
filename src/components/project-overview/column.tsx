@@ -7,6 +7,8 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableRowActions } from './data-table-row-actions'
 import { ApplicationItem } from '@/types/application-item'
 import { callTypes } from './data'
+import { DataTableBuildLogsActions } from './data-table-buildlogs-actions'
+import { getMappingOption } from '@/constants/misc'
 
 export const columns: ColumnDef<ApplicationItem>[] = [
     {
@@ -66,6 +68,15 @@ export const columns: ColumnDef<ApplicationItem>[] = [
         ),
     },
     {
+        accessorKey: 'service_type',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Service Type' />
+        ),
+        cell: ({ row }) => (
+            <span>{getMappingOption(row.getValue('service_type'))}</span>
+        ),
+    },
+    {
         accessorKey: 'status',
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Status' />
@@ -84,6 +95,13 @@ export const columns: ColumnDef<ApplicationItem>[] = [
         filterFn: 'weakEquals',
         enableSorting: true,
         enableHiding: true,
+    },
+    {
+        id: 'buildlogs',
+        header: ({ column }) => (
+            <DataTableColumnHeader column={column} title='Build Logs' />
+        ),
+        cell: DataTableBuildLogsActions,
     },
     {
         id: 'actions',

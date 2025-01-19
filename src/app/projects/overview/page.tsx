@@ -27,17 +27,8 @@ import { ApplicationItem } from "@/types/application-item";
 import Link from "next/link";
 import { addNewItems } from "@/constants/add-new";
 
-const generateScheduledDeployAt = (): string => {
-    const now = new Date();
-    const extraSeconds = 30 * 1000;
-    const futureDate = new Date(now.getTime() + (7 * 60 * 60 * 1000) + extraSeconds); // Add +7 hours
-    const theFuture = futureDate.toISOString().slice(0, 19);
-    console.log(theFuture)
-    return theFuture;
-};
-
 export default function ProjectOverviewPage() {
-    const [loading, setLoading] = useState<boolean>(false);
+    const [loading, setLoading] = useState<boolean>(true);
     const [appList, setAppList] = useState<ApplicationItem[]>([]);
     const [repos, setRepos] = useState<RepoItem[]>([]);
     const { accessToken } = useAuth();

@@ -7,7 +7,7 @@ export const DATABASE = 'Database'
 export const getMappingOption = (key: string) => {
     const dict: { [key: string]: string } = {
         'db_mysql': 'MySQL',
-        'db_postgresl': 'PostgreSQL',
+        'db_postgresql': 'PostgreSQL',
         'service_type': 'Service Type',
         'tag': 'Tag',
         'latest': "Latest"
@@ -18,7 +18,7 @@ export const getMappingOption = (key: string) => {
 export const getMappingOptionValue = (value: string) => {
     const dict: { [value: string]: string } = {
         'db_mysql': 'mysql',
-        'db_postgresl': 'postgresql',
+        'db_postgresql': 'postgresql',
         'db_mongo': 'mongo'
     };
     return dict[value] || ''; // Returns the mapped value if it exists, or null if the key is not found
@@ -30,6 +30,9 @@ export const getMappingEnvVar = (key: string) => {
         "MYSQL_USER": USERNAME,
         "MYSQL_PASSWORD": PASSWORD,
         "MYSQL_ROOT_PASSWORD": "Root Password",
+        "POSTGRES_DB": DATABASE,
+        "POSTGRES_USER": USERNAME,
+        "POSTGRES_PASSWORD": PASSWORD,
     };
     return dict[key] || null; // Returns the mapped value if it exists, or null if the key is not found
 };

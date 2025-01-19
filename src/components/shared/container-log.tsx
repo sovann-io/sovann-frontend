@@ -11,8 +11,8 @@ const ContainerLog = ({ appId }: { appId: string }) => {
                 const response = await fetch(`${API_BASE_URL}/applications/${appId}/container/logs`);
                 const data = await response.json();
                 // Split logs into an array by newline
-                if (data.status == 'success') {
-                    setLogs(data.data.split('\n').slice(0, -1));
+                if (data.success) {
+                    setLogs(data.data)
                 }
             } catch (error) {
                 console.error("Failed to fetch logs:", error);

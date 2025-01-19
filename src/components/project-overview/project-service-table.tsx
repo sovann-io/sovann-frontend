@@ -8,9 +8,10 @@ import { DataTableSkeleton } from "../shared/table/data-table-skeleton";
 import DataTableDialogContent from "../shared/table/data-table-dialog-content";
 import ContainerLog from "../shared/container-log";
 import { deleteAppNameById, getApplicationDetailById } from "@/services/application-service";
-import Spinner from "../shared/spinner.tsx";
+import Spinner from "../shared/spinner";
 import { SERVICE_TYPE } from "@/constants/misc";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 export default function ProjectServiceTable({ data, loading }: { data: ApplicationItem[], loading: boolean }) {
     const router = useRouter()
@@ -41,8 +42,10 @@ export default function ProjectServiceTable({ data, loading }: { data: Applicati
         if (currentRow?.id) {
             try {
                 const response = await deleteAppNameById(currentRow.id)
+                console.log(response)
                 if (response.success) {
                     router.refresh()
+                    toast.success('Service deleted successfully')
                 }
             } catch (err) {
                 setError((err as any).message || 'An error occurred.');
@@ -52,16 +55,16 @@ export default function ProjectServiceTable({ data, loading }: { data: Applicati
     return (
         <TableListContextProvider value={{ open, setOpen, currentRow, setCurrentRow }}>
             {/* Table component */}
-            {madeChangeLoading && <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+            {/* {madeChangeLoading && <div className="absolute inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
                 <div className="flex items-center space-x-2">
                     <Spinner />
                     <span>Loading...</span>
                 </div>
-            </div>}
+            </div>} */}
             <div className='grid space-y-4 overflow-auto'>
-                <div>
+                {/* <div>
                     <h4 className="text-lg">Ungrouped Services</h4>
-                </div>
+                </div> */}
                 <div className="px-2">
                     {loading ?
                         <DataTableSkeleton columnCount={4} rowCount={20} />

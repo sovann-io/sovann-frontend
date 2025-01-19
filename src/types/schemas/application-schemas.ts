@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { DatabaseType } from "../database-item";
+import { databaseConfigs } from "@/configs/database-config";
 
 export const applicationFormSchema = z.object({
     app_name: z.string().min(1, "App name is required"),
@@ -54,8 +56,49 @@ export const applicationFormSchema = z.object({
         z.object({
             key: z.string(),
             value: z.string(),
-        })     
+        })
     ),
 });
 
 export type ApplicationFormValues = z.infer<typeof applicationFormSchema>;
+
+export const createDefaultValues = (dbType: DatabaseType) => ({
+    app_name: '',
+    project_id: '5d3c9116-d86a-481e-95b3-2739d3c0b512',
+    description: '1',
+    deployed_version: 'testing',
+    not_expose_as_web_app: false,
+    has_persistent_data: false,
+    has_default_subdomain_ssl: false,
+    force_ssl: false,
+    websocket_support: false,
+    instance_count: 0,
+    pre_deploy_function: '1',
+    custom_nginx_config: '1',
+    redirect_domain: '1',
+    app_deploy_token_enabled: false,
+    app_deploy_token: '1',
+    is_app_building: false,
+    is_instant_deploy: true,
+    scheduled_deploy_at: new Date().toISOString(),
+    http_auth_user: '1',
+    http_auth_password: '1',
+    dockerfile_content: '1',
+    dockercompose_content: '1',
+    status: 'DRAFT',
+    networks: [],
+    repo: null,
+    container_command: '',
+    env_vars: Array(dbType === 'mysql' ? 4 : 3).fill({ key: '', value: '', is_secret: false }),
+    volumes: [],
+    ports: [{
+        container_port: databaseConfigs[dbType].defaultPort,
+        host_port: dbType === 'mysql' ? 3311 : databaseConfigs[dbType].defaultPort,
+        protocol: 'tcp',
+        publish_mode: 'string'
+    }],
+    options: [
+        { key: 'service_type', value: `db_${dbType}` },
+        { key: 'tag', value: 'latest' }
+    ],
+});

@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { editAppNameById, getApplicationDetailById } from "@/services/application-service";
 import { ApplicationItem } from "@/types/application-item";
 import { Check, Pause, RotateCcw, Trash2 } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import moment from 'moment';
 import { DATABASE, getMappingEnvVar, getMappingOption, getMappingOptionValue, PASSWORD, SERVICE_TYPE, USERNAME } from "@/constants/misc";
@@ -20,6 +20,7 @@ import { toast } from "sonner";
 const ServiceDetailPage = () => {
     // Get the data from the URL
     const params = usePathname()
+    const router = useRouter()
 
     // Split the URL to get the Type and ID
     const [_, type, id] = params.split("/")
@@ -30,7 +31,6 @@ const ServiceDetailPage = () => {
     const [externalUrl, setExternalUrl] = useState<string>('')
     const [appName, setAppName] = useState<string>('')
     const [editableAppName, setEditableAppName] = useState<boolean>(false)
-    const [madeChange, setMadeChange] = useState<boolean>(false)
 
     useEffect(() => {
         async function getApplicationDetail() {
@@ -51,7 +51,7 @@ const ServiceDetailPage = () => {
             }
         }
         getApplicationDetail()
-    }, [madeChange, setMadeChange])
+    }, [])
 
     async function handleAppNameChanged() {
         try {
@@ -59,7 +59,7 @@ const ServiceDetailPage = () => {
             if (response.success) {
                 toast.info("Application has been renamed to " + appName)
                 setEditableAppName(false)
-                setMadeChange(!madeChange)
+                router.refresh()
             }
         } catch (error) {
             console.log(error)
@@ -123,13 +123,7 @@ const ServiceDetailPage = () => {
                 </div>
                 <hr className="my-4" />
                 <div className="my-6">
-                    {app?.options?.map((option: OptionItem) => {
-                        if (option.key === SERVICE_TYPE) {
-                            return (
-                                <h2 key={option.key + "_info"} className="text-2xl">Info {getMappingOption(option.value)}</h2>
-                            )
-                        }
-                    })}
+                    <h2 className="text-2xl">Info {getMappingOption(app?.service_type || '')}</h2>
                 </div>
                 <div className="p-6 border grid space-y-10">
                     <h2 className="text-xl font-medium">General</h2>
