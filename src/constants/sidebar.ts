@@ -1,69 +1,81 @@
-import { NavItem } from '@/types/nav-item';
+import { NavGroup, NavItem } from '@/types/nav-item';
 
-export type Product = {
-    photo_url: string;
-    name: string;
-    description: string;
-    created_at: string;
-    price: number;
-    id: number;
-    category: string;
-    updated_at: string;
-};
-
-//Info: The following data is used for the sidebar navigation and Cmd K bar.
-export const navItems: NavItem[] = [
+export const navGroups: NavGroup[] = [
     {
-        title: 'Projects',
-        url: '/projects/overview',
-        icon: 'project',
-        isActive: false,
-        shortcut: ['d', 'd'],
-        items: [] // Empty array as there are no child items for Dashboard
-    },
-    {
-        title: 'MySQL',
-        url: '/new/mysql',
-        icon: 'product',
-        shortcut: ['p', 'p'],
-        isActive: false,
-        items: [] // No child items
-    },
-    {
-        title: 'PostgreSQL',
-        url: '/new/postgresql',
-        icon: 'product',
-        shortcut: ['p', 'p'],
-        isActive: false,
-        items: [] // No child items
-    },
-    {
-        title: 'Account',
-        url: '#', // Placeholder as there is no direct link for the parent
-        icon: 'billing',
-        isActive: true,
-
+        label: 'Main Navigation',
         items: [
             {
-                title: 'Profile',
-                url: '/dashboard/profile',
-                icon: 'userPen',
-                shortcut: ['m', 'm']
+                title: 'Projects',
+                url: '/projects/overview',
+                icon: 'project',
+                isActive: false,
+                shortcut: ['d', 'd'],
+                items: []
             },
             {
-                title: 'Login',
-                shortcut: ['l', 'l'],
-                url: '/',
-                icon: 'login'
+                title: 'Create MySQL',
+                url: '/new/mysql',
+                icon: 'project',
+                isActive: false,
+                shortcut: ['d', 'd'],
+                items: []
+            },
+            {
+                title: 'Account',
+                url: '#',
+                icon: 'billing',
+                isActive: true,
+                items: [
+                    {
+                        title: 'Profile',
+                        url: '/dashboard/profile',
+                        icon: 'userPen',
+                        shortcut: ['m', 'm']
+                    },
+                    {
+                        title: 'Login',
+                        shortcut: ['l', 'l'],
+                        url: '/',
+                        icon: 'login'
+                    }
+                ]
+            }
+        ]
+    }
+];
+
+export const postgreSQLNavGroups: NavGroup[] = [
+    {
+        label: 'PostgreSQL',
+        items: [
+            {
+                title: 'Databases',
+                url: '/databases/overview',
+                icon: 'billing',
+                isActive: false,
+                shortcut: ['d', 'd'],
+                items: []
+            },
+            {
+                title: 'Create Database',
+                url: '/databases/create',
+                icon: 'add',
+                isActive: true,
+                items: []
             }
         ]
     },
     {
-        title: 'Kanban',
-        url: '/dashboard/kanban',
-        icon: 'kanban',
-        shortcut: ['k', 'k'],
-        isActive: false,
-        items: [] // No child items
+        label: 'Settings',
+        items: [
+            {
+                title: 'Environment Variables',
+                url: '/databases/env-vars',
+                icon: 'billing',
+                isActive: false,
+                shortcut: ['e', 'e'],
+                items: []
+            }
+        ]
     }
 ];

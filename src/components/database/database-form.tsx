@@ -18,6 +18,7 @@ import { Button } from '../ui/button';
 import { VersionSelect } from './version-selection';
 import { ScheduleSection } from './schedule-selection';
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group';
+import { postgreSQLNavGroups } from '@/constants/sidebar';
 
 interface DatabaseFormProps {
     dbType: DatabaseType;
@@ -74,7 +75,10 @@ export const DatabaseForm = ({ dbType }: DatabaseFormProps) => {
     };
 
     return (
-        <DashboardPage>
+        <DashboardPage
+            groups={postgreSQLNavGroups}
+            showBackButton={true}
+        >
             <DatabaseLayout title={config.title}>
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className="grid grid-cols-1 gap-8 space-y-4">

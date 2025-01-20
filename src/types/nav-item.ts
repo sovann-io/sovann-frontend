@@ -1,5 +1,10 @@
 import { Icons } from '@/components/icons';
 
+export interface NavGroup {
+    label?: string;
+    items: NavItem[];
+}
+
 export interface NavItem {
     title: string;
     url: string;
