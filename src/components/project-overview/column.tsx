@@ -8,7 +8,8 @@ import { DataTableRowActions } from './data-table-row-actions'
 import { ApplicationItem } from '@/types/application-item'
 import { callTypes } from './data'
 import { DataTableBuildLogsActions } from './data-table-buildlogs-actions'
-import { getMappingOption } from '@/constants/misc'
+import { getMappingOption, SERVICE_TYPE } from '@/constants/misc'
+import Link from 'next/link'
 
 export const columns: ColumnDef<ApplicationItem>[] = [
     {
@@ -46,9 +47,26 @@ export const columns: ColumnDef<ApplicationItem>[] = [
         header: ({ column }) => (
             <DataTableColumnHeader column={column} title='Service Name' />
         ),
-        cell: ({ row }) => (
-            <LongText className='max-w-36'>{row.getValue('app_name')}</LongText>
-        ),
+        cell: ({ row }) => {
+            const { id } = row.original
+            const { options } = row.original
+            let serviceType = ''
+            options?.map((option: any) => {
+                if (option.key === SERVICE_TYPE) {
+                    const values = option.value.split('_')
+                    serviceType = values[0]
+                }
+            })
+            if (id && serviceType) {
+                return (
+                    <Link href={`/${serviceType}/${id}/info`}>
+                        <LongText className='max-w-36 underline'>{row.getValue('app_name')}</LongText>
+                    </Link>
+                )
+            } else {
+                return <LongText className='max-w-36'>{row.getValue('app_name')}</LongText>
+            }
+        },
         meta: {
             className: cn(
                 'drop-shadow-[0_1px_2px_rgb(0_0_0_/_0.1)] dark:drop-shadow-[0_1px_2px_rgb(255_255_255_/_0.1)] lg:drop-shadow-none',

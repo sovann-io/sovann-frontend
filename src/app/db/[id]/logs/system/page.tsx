@@ -1,7 +1,7 @@
 "use client";
 
 import DashboardPage from "@/app/dashboard/page";
-import { useParams } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LazyLog } from "@melloware/react-logviewer";
 import { API_BASE_URL } from "@/constants/auth";
@@ -10,21 +10,23 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Check, CircleX } from "lucide-react";
-import { navGroups } from "@/constants/sidebar";
+import { dynamicNavGroups, navGroups } from "@/constants/sidebar";
 
 
-export default function BuildLogsPage() {
-    const params = useParams();
+export default function SystemLogsPage() {
+    const pathname = usePathname()
     const [connectToWS, setConnectToWS] = useState<boolean>(false);
     const [connectToWSLoading, setConnectToWSLoading] = useState<boolean>(false);
     const [buildLogs, setBuildLogs] = useState<BuildLogItem[]>([])
+
+    const [_, type, id] = pathname.split("/")
 
     useEffect(() => {
         async function connectToBuildLogWS() {
             setConnectToWSLoading(true);
             try {
                 // Simulating WebSocket or Database connection logic
-                console.log("Connecting to WebSocket/Database with params:", params);
+                console.log("Connecting to WebSocket/Database with params:", id);
                 await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async operation
                 setConnectToWS(true);
             } catch (error) {
@@ -46,7 +48,7 @@ export default function BuildLogsPage() {
         // connectToBuildLog()
 
         async function connectToBuildLogDB() {
-            const response = await axios.get(API_BASE_URL + "/build_logs/" + params.id + "/logs");
+            const response = await axios.get(API_BASE_URL + "/build_logs/" + id + "/logs");
             const data = response.data;
             if (data.success) {
                 setBuildLogs(data.data);
@@ -57,13 +59,13 @@ export default function BuildLogsPage() {
         } else {
             connectToBuildLogDB()
         }
-    }, [params]);
+    }, [pathname]);
 
     return (
-        <DashboardPage groups={navGroups} showBackButton={false}>
+        <DashboardPage groups={dynamicNavGroups(id)} showBackButton={true}>
             <div className="grid space-y-4">
                 <div className="flex justify-between items-center py-1">
-                    <h1 className="text-2xl">Build Logs</h1>
+                    <h1 className="text-2xl">Systemx Logs</h1>
                     {/* {connectToWSLoading ? (
                         <span className="text-gray-500">Connecting...</span>
                     ) : connectToWS ? (

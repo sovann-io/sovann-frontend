@@ -26,6 +26,7 @@ import { getApplicationListService } from "@/services/application-service";
 import { ApplicationItem } from "@/types/application-item";
 import Link from "next/link";
 import { addNewItems } from "@/constants/add-new";
+import { navGroups } from "@/constants/sidebar";
 
 export default function ProjectOverviewPage() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -76,7 +77,7 @@ export default function ProjectOverviewPage() {
     };
 
     return (
-        <DashboardPage>
+        <DashboardPage groups={navGroups} showBackButton={false}>
             <div className="grid space-y-4">
                 <div className="flex justify-between items-center">
                     <h1 className="text-2xl">Project Overview</h1>

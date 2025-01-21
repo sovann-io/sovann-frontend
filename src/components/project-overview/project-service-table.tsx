@@ -7,10 +7,9 @@ import { columns } from "./column";
 import { DataTableSkeleton } from "../shared/table/data-table-skeleton";
 import DataTableDialogContent from "../shared/table/data-table-dialog-content";
 import ContainerLog from "../shared/container-log";
-import { deleteAppNameById, getApplicationDetailById } from "@/services/application-service";
-import Spinner from "../shared/spinner";
+import { deleteAppNameById } from "@/services/application-service";
 import { SERVICE_TYPE } from "@/constants/misc";
-import { useRouter } from "next/navigation";
+import { useRouter } from 'nextjs-toploader/app';
 import { toast } from "sonner";
 
 export default function ProjectServiceTable({ data, loading }: { data: ApplicationItem[], loading: boolean }) {
@@ -27,7 +26,7 @@ export default function ProjectServiceTable({ data, loading }: { data: Applicati
                     currentRow?.options?.map((option: any) => {
                         if (option.key === SERVICE_TYPE) {
                             const values = option.value.split('_')
-                            router.push(`/${values[0]}/${currentRow.id}`)
+                            router.push(`/${values[0]}/${currentRow.id}/info`)
                         }
                     })
                 } catch (err) {

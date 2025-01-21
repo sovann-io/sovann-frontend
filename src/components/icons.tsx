@@ -16,6 +16,7 @@ import {
     LayoutDashboardIcon,
     Loader2,
     LogIn,
+    Logs,
     LucideIcon,
     LucideProps,
     LucideShoppingBag,
@@ -26,7 +27,6 @@ import {
     Settings,
     SunMedium,
     Trash,
-    Twitter,
     User,
     UserCircle2Icon,
     UserPen,
@@ -65,6 +65,7 @@ export const Icons = {
     sun: SunMedium,
     moon: Moon,
     laptop: Laptop,
+    logs: Logs,
     gitHub: ({ ...props }: LucideProps) => (
         <svg
             aria-hidden='true'

@@ -1,7 +1,8 @@
 import { Row } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { ApplicationItem } from '@/types/application-item'
-import { useRouter } from 'next/navigation'
+// import { useRouter } from 'next/navigation'
+import { useRouter } from 'nextjs-toploader/app';
 
 interface DataTableRowActionsProps {
   row: Row<ApplicationItem>

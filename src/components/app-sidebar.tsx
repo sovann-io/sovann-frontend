@@ -41,11 +41,13 @@ import {
   LogOut
 } from 'lucide-react';
 import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
+import { useRouter } from 'nextjs-toploader/app';
 import * as React from 'react';
 import { Icons } from '@/components/icons';
 import { NavGroup } from '@/types/nav-item';
 import { Button } from './ui/button';
+import { toast } from 'sonner';
 
 export const company = {
   name: 'Acme Inc',
@@ -86,19 +88,26 @@ export default function AppSidebar({ groups, showBackButton }: AppSidebarProps) 
       </SidebarHeader>
       <SidebarContent className='overflow-x-hidden'>
         <SidebarGroup>
-          {showBackButton && (
-            <div className='flex items-center text-xs text-sidebar-accent-foreground cursor-pointer'>
+          {(showBackButton && state === 'expanded') && (
+            <div className='flex items-center justify-start text-xs text-sidebar-accent-foreground cursor-pointer'>
               <Button
-                className='ml-0.5'
-                onClick={() => router.back()}
+                className='ml-[-1px]'
+                onClick={() => router.push('/projects/overview')}
                 variant={'ghost'}>
                 <ArrowLeftIcon className='size-4' />
                 Back
               </Button>
             </div>
           )}
+          {(showBackButton && state === 'collapsed') && (
+            <div className='my-2 flex items-center justify-center text-xs text-sidebar-accent-foreground cursor-pointer'>
+              <Button variant={'ghost'} onClick={() => router.replace('/projects/overview')} className='w-full'>
+                <ArrowLeftIcon className='size-5 cursor-pointer' />
+              </Button>
+            </div>
+          )}
           {groups.map((group) => (
-            <div key={group.label} className="flex flex-col gap-2">
+            <div key={group.label} className="flex flex-col my-1">
               {group.label && (
                 <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
               )}

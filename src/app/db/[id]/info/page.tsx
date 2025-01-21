@@ -4,7 +4,6 @@ import DashboardPage from "@/app/dashboard/page";
 import CopyToClipboard from "@/components/shared/copy-to-clipboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { editAppNameById, getApplicationDetailById } from "@/services/application-service";
 import { ApplicationItem } from "@/types/application-item";
@@ -16,14 +15,15 @@ import { DATABASE, getMappingEnvVar, getMappingOption, getMappingOptionValue, PA
 import PasswordField from "@/components/shared/password-field";
 import { EnvVarItem, OptionItem, PortItem } from "@/types/sub-app-item";
 import { toast } from "sonner";
+import { dynamicNavGroups, postgreSQLNavGroups } from "@/constants/sidebar";
 
 const ServiceDetailPage = () => {
     // Get the data from the URL
-    const params = usePathname()
+    const pathname = usePathname()
     const router = useRouter()
 
     // Split the URL to get the Type and ID
-    const [_, type, id] = params.split("/")
+    const [_, type, id] = pathname.split("/")
 
     const [app, setApp] = useState<ApplicationItem>()
     const [error, setError] = useState<string>()
@@ -67,66 +67,41 @@ const ServiceDetailPage = () => {
     }
 
     return (
-        <DashboardPage>
+        <DashboardPage groups={dynamicNavGroups(id)} showBackButton={true}>
             <div className="px-4 py-2 overflow-auto">
                 <div className="flex justify-between items-center py-2">
-                    <h1 className="text-2xl">Service Detail Page</h1>
+                    <h1 className="text-[24px]">Service Detail Page</h1>
                     <Popover>
                         <PopoverTrigger asChild>
                             <Button variant="outline">Connect</Button>
                         </PopoverTrigger>
-                        <PopoverContent className="w-80">
+                        <PopoverContent className="w-[500px]">
                             <div className="grid gap-4">
                                 <div className="space-y-2">
-                                    <h4 className="font-medium leading-none">Dimensions</h4>
+                                    <h4 className="font-medium leading-none">Java</h4>
                                     <p className="text-sm text-muted-foreground">
-                                        Set the dimensions for the layer.
+                                        Connect to your service using the following connection string.
                                     </p>
                                 </div>
-                                <div className="grid gap-2">
-                                    <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label htmlFor="width">Width</Label>
-                                        <Input
-                                            id="width"
-                                            defaultValue="100%"
-                                            className="col-span-2 h-8"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label htmlFor="maxWidth">Max. width</Label>
-                                        <Input
-                                            id="maxWidth"
-                                            defaultValue="300px"
-                                            className="col-span-2 h-8"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label htmlFor="height">Height</Label>
-                                        <Input
-                                            id="height"
-                                            defaultValue="25px"
-                                            className="col-span-2 h-8"
-                                        />
-                                    </div>
-                                    <div className="grid grid-cols-3 items-center gap-4">
-                                        <Label htmlFor="maxHeight">Max. height</Label>
-                                        <Input
-                                            id="maxHeight"
-                                            defaultValue="none"
-                                            className="col-span-2 h-8"
-                                        />
-                                    </div>
+                                <div className="flex items-center gap-2 overflow-scroll">
+                                    <Input
+                                        className="w-full"
+                                        value={`jdbc:${internalUrl}`}
+                                    />
+                                    <CopyToClipboard
+                                        text={`jdbc:${externalUrl}`}
+                                    />
                                 </div>
                             </div>
                         </PopoverContent>
                     </Popover>
                 </div>
                 <hr className="my-4" />
-                <div className="my-6">
-                    <h2 className="text-2xl">Info {getMappingOption(app?.service_type || '')}</h2>
+                <div className="my-4">
+                    <h2 className="text-xl">Info {getMappingOption(app?.service_type || '')}</h2>
                 </div>
-                <div className="p-6 border grid space-y-10">
-                    <h2 className="text-xl font-medium">General</h2>
+                <div className="p-6 border grid space-y-8">
+                    <h2 className="text-lg font-medium">General</h2>
                     <div className="grid grid-cols-4 gap-4 items-center">
                         <div className="text-gray-300">Name</div>
                         <div className="col-span-3 flex gap-4">
@@ -180,7 +155,7 @@ const ServiceDetailPage = () => {
                 </div>
                 <div className="my-4"></div>
                 <div className="p-6 border grid space-y-10">
-                    <h2 className="text-xl font-medium">Connections</h2>
+                    <h2 className="text-lg font-medium">Connections</h2>
                     <div className="grid grid-cols-4 gap-4 items-center">
                         <div className="text-gray-300">Hostname</div>
                         <div className="col-span-3 flex gap-4">
