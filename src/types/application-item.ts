@@ -35,5 +35,10 @@ export interface ApplicationItem {
     websocket_support: boolean;
     options: [OptionItem],
     ports: [PortItem],
-    env_vars: [EnvVarItem]
+    env_vars: [EnvVarItem],
+    networks: [string],
+    repo: {
+        repo_url: string,
+        branch: string,
+    }
 }

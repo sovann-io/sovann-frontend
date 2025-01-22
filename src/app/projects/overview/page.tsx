@@ -27,8 +27,10 @@ import { ApplicationItem } from "@/types/application-item";
 import Link from "next/link";
 import { addNewItems } from "@/constants/add-new";
 import { navGroups } from "@/constants/sidebar";
+import { useRouter } from "nextjs-toploader/app";
 
 export default function ProjectOverviewPage() {
+    const router = useRouter()
     const [loading, setLoading] = useState<boolean>(true);
     const [appList, setAppList] = useState<ApplicationItem[]>([]);
     const [repos, setRepos] = useState<RepoItem[]>([]);
@@ -41,9 +43,10 @@ export default function ProjectOverviewPage() {
         resolver: zodResolver(applicationFormSchema),
     });
 
+    const [toRefresh, setToRefresh] = useState<boolean>(false)
+
     useEffect(() => {
         async function getApplicationList() {
-            setLoading(true);
             try {
                 const response = await getApplicationListService()
                 if (response.success === true) {
@@ -62,7 +65,7 @@ export default function ProjectOverviewPage() {
             setLoading(false);
         }
         getApplicationList();
-    }, []);
+    }, [toRefresh]);
 
     const onSubmit: SubmitHandler<ApplicationFormValues> = async (data) => {
         if (!accessToken) {
@@ -120,22 +123,20 @@ export default function ProjectOverviewPage() {
                             <DropdownMenuContent className="w-44">
                                 <DropdownMenuGroup>
                                     {addNewItems.slice(0, 1).map((item, index) => (
-                                        <DropdownMenuItem key={index}>
+                                        <DropdownMenuItem onClick={() => router.push(item.href)} key={index + 1}>
                                             {item.icon}
-                                            <Link href={item.href} className="mx-4">
-                                                {item.label}
-                                            </Link>
+                                            <span className="mx-0.5"></span>
+                                            {item.label}
                                         </DropdownMenuItem>
                                     ))}
                                 </DropdownMenuGroup>
                                 <DropdownMenuSeparator />
                                 <DropdownMenuGroup>
                                     {addNewItems.slice(1).map((item, index) => (
-                                        <DropdownMenuItem key={index + 1}>
+                                        <DropdownMenuItem onClick={() => router.push(item.href)} key={index + 1}>
                                             {item.icon}
-                                            <Link href={item.href} className="mx-4">
-                                                {item.label}
-                                            </Link>
+                                            <span className="mx-0.5"></span>
+                                            {item.label}
                                         </DropdownMenuItem>
                                     ))}
                                 </DropdownMenuGroup>
@@ -145,6 +146,8 @@ export default function ProjectOverviewPage() {
                 </div>
                 <div>
                     <ProjectServiceTable
+                        toRefresh={toRefresh}
+                        setToRefresh={setToRefresh}
                         data={appList}
                         loading={loading}
                     />

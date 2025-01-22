@@ -8,6 +8,7 @@ export const getMappingOption = (key: string) => {
     const dict: { [key: string]: string } = {
         'db_mysql': 'MySQL',
         'db_postgresql': 'PostgreSQL',
+        'app_static': 'Static Site',
         'service_type': 'Service Type',
         'tag': 'Tag',
         'latest': "Latest"

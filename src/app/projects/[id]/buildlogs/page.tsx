@@ -71,14 +71,14 @@ export default function BuildLogsPage() {
                     ) : (
                         <span className="text-red-500">Disconnected</span>
                     )} */}
-                    <div className="flex items-center space-x-4">
+                    {/* <div className="flex items-center space-x-4">
                         <Checkbox
                             id="logs-check"
                             checked={!connectToWS}
                             onCheckedChange={() => setConnectToWS(!connectToWS)}
                         />
                         <Label htmlFor="logs-check" className="ml-2">Get logs from database</Label>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             {!connectToWS && (
@@ -98,7 +98,7 @@ export default function BuildLogsPage() {
                                                 <CircleX size={21} />
                                             </div>
                                         )}
-                                        <span className="text-lg">Version: {log.version}</span>
+                                        <span className="text-lg">Log Number: {log.version}</span>
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent className="p-2">

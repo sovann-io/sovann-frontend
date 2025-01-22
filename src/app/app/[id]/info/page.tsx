@@ -4,34 +4,41 @@ import DashboardPage from "@/app/dashboard/page";
 import CopyToClipboard from "@/components/shared/copy-to-clipboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { editAppNameById, getApplicationDetailById, resumeApplicationById, suspendApplicationById } from "@/services/application-service";
+import { PopoverTrigger } from "@/components/ui/popover";
+import { editAppNameById, getApplicationDetailById } from "@/services/application-service";
 import { ApplicationItem } from "@/types/application-item";
-import { Pause, Play, RotateCcw, Trash2 } from "lucide-react";
+import { Pause, Play, Trash2 } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import moment from 'moment';
-import { DATABASE, getMappingEnvVar, getMappingOption, getMappingOptionValue, PASSWORD, SERVICE_TYPE, USERNAME } from "@/constants/misc";
+import { getMappingEnvVar, getMappingOption } from "@/constants/misc";
 import PasswordField from "@/components/shared/password-field";
 import { EnvVarItem, OptionItem, PortItem } from "@/types/sub-app-item";
 import { toast } from "sonner";
-import { dynamicNavGroups } from "@/constants/sidebar";
+import { appStaticNavGroups, dynamicNavGroups } from "@/constants/sidebar";
 import { displayAppStatus } from "@/lib/project-utils";
+import { getRepositoryByAppId } from "@/services/repo-service";
+import { RepositoryItem } from "@/types/repository-item";
+import { ACCESS_TOKEN, API_BASE_URL } from "@/constants/auth";
+import { Textarea } from "@/components/ui/textarea";
+import localforage from "localforage";
+import { useAuth } from "@/hooks/use-auth";
 
-const ServiceDetailPage = () => {
+const AppServiceDetailPage = () => {
     // Get the data from the URL
     const pathname = usePathname()
     const router = useRouter()
+
+    const { accessToken } = useAuth()
 
     // Split the URL to get the Type and ID
     const [_, type, id] = pathname.split("/")
 
     const [app, setApp] = useState<ApplicationItem>()
     const [error, setError] = useState<string>()
-    const [internalUrl, setInternalUrl] = useState<string>('')
-    const [externalUrl, setExternalUrl] = useState<string>('')
     const [appName, setAppName] = useState<string>('')
     const [editableAppName, setEditableAppName] = useState<boolean>(false)
+    const [repo, setRepo] = useState<RepositoryItem>()
 
     useEffect(() => {
         async function getApplicationDetail() {
@@ -39,10 +46,12 @@ const ServiceDetailPage = () => {
                 const response = await getApplicationDetailById(id)
                 if (response.success) {
                     setApp(response.data)
-                    const { internal, external } = getIntExtDatabaseUrl(response.data)
-                    setInternalUrl(internal)
-                    setExternalUrl(external)
                     setAppName(response.data.app_name)
+
+                    const repoResponse = await getRepositoryByAppId(id)
+                    if (repoResponse.success) {
+                        setRepo(repoResponse.data)
+                    }
                 } else {
                     setError("Error fetching application details")
                 }
@@ -67,69 +76,21 @@ const ServiceDetailPage = () => {
         }
     }
 
-    async function handleResumeSuspendDatabaseButtonClicked(isResume: boolean) {
-        try {
-            const sure = confirm("Are you sure you want to " + (isResume ? "resume" : "suspend") + " this database?")
-            if (!sure) return
-            if (isResume) {
-                const response = await resumeApplicationById(id)
-                if (response.success) {
-                    toast.info("Database has been resumed")
-                    setApp({
-                        ...app!,
-                        status: 'ACTIVE'
-                    })
-                    router.refresh()
-                }
-            } else {
-                const response = await suspendApplicationById(id)
-                if (response.success) {
-                    toast.info("Database has been suspended")
-                    setApp({
-                        ...app!,
-                        status: 'INACTIVE'
-                    })
-                    router.refresh()
-                }
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
+    const [showDeployHook, setShowDeployHook] = useState<boolean>(false)
 
     return (
-        <DashboardPage groups={dynamicNavGroups(id)} showBackButton={true}>
+        <DashboardPage groups={appStaticNavGroups(id)} showBackButton={true}>
             <div className="px-4 py-2 overflow-auto">
                 <div className="flex justify-between items-center py-2">
                     <h1 className="text-[24px]">Service Detail Page</h1>
-                    <Popover>
-                        <PopoverTrigger asChild>
-                            <Button variant="outline">Connect</Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-[500px]">
-                            <div className="grid gap-4">
-                                <div className="space-y-2">
-                                    <h4 className="font-medium leading-none">Java</h4>
-                                    <p className="text-sm text-muted-foreground">
-                                        Connect to your service using the following connection string.
-                                    </p>
-                                </div>
-                                <div className="flex items-center gap-2 overflow-scroll">
-                                    <Input
-                                        className="w-full"
-                                        value={`jdbc:${internalUrl}`}
-                                    />
-                                    <CopyToClipboard
-                                        text={`jdbc:${externalUrl}`}
-                                    />
-                                </div>
-                            </div>
-                        </PopoverContent>
-                    </Popover>
+                    <Button variant="outline">Manual Deploy</Button>
                 </div>
                 <hr className="my-4" />
-                <div className="my-4">
+                <div className="my-4 flex flex-col space-y-2">
                     <h2 className="text-xl">Info {getMappingOption(app?.service_type || '')}</h2>
+                    <a href={"http://" + app?.app_name + "." + "localhost"} target="_blank" className="text-blue-500">
+                        {app?.app_name + "." + "localhost"}
+                    </a>
                 </div>
                 <div className="p-6 border grid space-y-8">
                     <h2 className="text-lg font-medium">General</h2>
@@ -186,15 +147,44 @@ const ServiceDetailPage = () => {
                 </div>
                 <div className="my-4"></div>
                 <div className="p-6 border grid space-y-10">
-                    <h2 className="text-lg font-medium">Connections</h2>
+                    <h2 className="text-lg font-medium">Build & Deploy</h2>
                     <div className="grid grid-cols-4 gap-4 items-center">
-                        <div className="text-gray-300">Hostname</div>
+                        <div className="text-gray-300">Repository</div>
                         <div className="col-span-3 flex gap-4">
                             <Input
                                 className="text-gray-300 disabled:text-gray-300"
-                                value={app?.iphostname?.ip || ''}
+                                value={repo?.repo_url || ''}
                                 disabled
                             />
+                            <CopyToClipboard
+                                text={repo?.repo_url || ''}
+                            />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-4 items-center">
+                        <div className="text-gray-300">Branch</div>
+                        <div className="col-span-3 flex gap-4">
+                            <Input
+                                className="text-gray-300"
+                                value={repo?.branch || ''}
+                                disabled
+                            />
+                        </div>
+                    </div>
+                    <div className="grid grid-cols-4 gap-4 items-center">
+                        <div className="text-gray-300">Deploy hook</div>
+                        <div className="col-span-3 flex gap-4">
+                            {showDeployHook ? (
+                                <Textarea
+                                    rows={6}
+                                    className="text-gray-300"
+                                    value={`curl --location --request POST '${API_BASE_URL}/applications/9a397a8d-d462-45a4-9a0b-3a33f0682d6e/redeploy' \ --header 'Authorization: Bearer ${accessToken}'`}
+                                    disabled
+                                />
+                            ) : <Input value={'*******************'} disabled />}
+                            <Button onClick={() => setShowDeployHook(!showDeployHook)} variant="outline">
+                                Show
+                            </Button>
                         </div>
                     </div>
                     {app?.ports.map((port: PortItem, index) => {
@@ -252,94 +242,30 @@ const ServiceDetailPage = () => {
                             </div>
                         )
                     })}
-                    <div className="grid grid-cols-4 gap-4 items-center">
-                        <div className="text-gray-300">Internal Database URL</div>
-                        <div className="col-span-3 flex gap-4">
-                            <Input
-                                className=""
-                                value={internalUrl}
-                                disabled
-                            />
-                            <CopyToClipboard
-                                text={internalUrl}
-                            />
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-4 gap-4 items-center">
-                        <div className="text-gray-300">External Database URL</div>
-                        <div className="col-span-3 flex gap-4">
-                            <Input
-                                className=""
-                                value={externalUrl}
-                                disabled
-                            />
-                            <CopyToClipboard
-                                text={externalUrl}
-                            />
-                        </div>
-                    </div>
                 </div>
                 <div className="flex space-x-4 py-4">
                     {/* Delete Database */}
                     <button className="flex items-center space-x-2 rounded-md bg-red-500 px-4 py-2 text-sm font-medium text-white hover:bg-red-600 focus:outline-none focus:ring focus:ring-red-300">
                         <Trash2 />
-                        <span>Delete Database</span>
+                        <span>Delete Static Site</span>
                     </button>
 
-                    {/* Restart Database */}
-                    <button className="flex items-center space-x-2 rounded-md bg-transparent px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 focus:outline-none focus:ring focus:ring-red-300">
-                        <RotateCcw />
-                        <span>Restart Database</span>
-                    </button>
-
+                    {/* Suspend Database */}
                     {app?.status === 'INACTIVE' ? (
-                        <button onClick={() => handleResumeSuspendDatabaseButtonClicked(true)} className="flex items-center space-x-2 rounded-md bg-transparent px-4 py-2 text-sm font-medium text-green-600 hover:bg-green-200 focus:outline-none focus:ring focus:ring-green-300">
+                        <button className="flex items-center space-x-2 rounded-md bg-transparent px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 focus:outline-none focus:ring focus:ring-red-300">
                             <Play />
-                            <span>Resume Database</span>
+                            <span>Activate Static Site</span>
                         </button>
                     ) : (
-                        <button onClick={() => handleResumeSuspendDatabaseButtonClicked(false)} className="flex items-center space-x-2 rounded-md bg-transparent px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-200 focus:outline-none focus:ring focus:ring-red-300">
+                        <button className="flex items-center space-x-2 rounded-md bg-transparent px-4 py-2 text-sm font-medium text-red-500 hover:bg-red-50 focus:outline-none focus:ring focus:ring-red-300">
                             <Pause />
-                            <span>Suspend Database</span>
+                            <span>Suspend Static Site</span>
                         </button>
                     )}
-                    {/* Suspend Database */}
                 </div>
             </div>
-        </DashboardPage >
+        </DashboardPage>
     )
 }
 
-const getIntExtDatabaseUrl = (app: ApplicationItem | undefined) => {
-    if (!app) return { internal: '', external: '' };
-
-    // Extract serviceType from options
-    const serviceType = app.options.reduce((type, option) => {
-        return option.key === SERVICE_TYPE ? getMappingOptionValue(option.value) || '' : type;
-    }, '');
-
-    // Extract username, password, and database from env_vars
-    const { username, password, db } = app.env_vars.reduce((acc, env: EnvVarItem) => {
-        const key = getMappingEnvVar(env.key);
-        if (key === USERNAME) acc.username = env.value;
-        else if (key === PASSWORD) acc.password = env.value;
-        else if (key === DATABASE) acc.db = env.value;
-        return acc;
-    }, { username: '', password: '', db: '' });
-
-    // Extract internal and external ports
-    const { internalPort, externalPort } = app.ports.reduce((acc, port: PortItem) => {
-        acc.internalPort = port.container_port;
-        acc.externalPort = port.host_port;
-        return acc;
-    }, { internalPort: '', externalPort: '' });
-
-    // Construct internal and external URLs
-    const internal = `${serviceType}://${username}:${password}@${app.app_name}:${internalPort}/${db}`;
-    const external = `${serviceType}://${username}:${password}@${app.iphostname.ip}:${externalPort}/${db}`;
-
-    return { internal, external };
-};
-
-
-export default ServiceDetailPage;
+export default AppServiceDetailPage;

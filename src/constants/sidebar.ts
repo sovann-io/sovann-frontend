@@ -11,23 +11,7 @@ export const navGroups: NavGroup[] = [
                 isActive: false,
                 shortcut: ['d', 'd'],
                 items: []
-            },
-            {
-                title: 'Create MySQL',
-                url: '/new/mysql',
-                icon: 'project',
-                isActive: false,
-                shortcut: ['d', 'd'],
-                items: []
-            },
-            {
-                title: 'Create PostgreSQL',
-                url: '/new/postgresql',
-                icon: 'project',
-                isActive: false,
-                shortcut: ['d', 'd'],
-                items: []
-            },
+            }, 
             {
                 title: 'Domains',
                 url: '/domains',
@@ -70,14 +54,14 @@ export const navGroups: NavGroup[] = [
     }
 ];
 
-export const dynamicNavGroups = (id: string): NavGroup[] => {
+export const dynamicNavGroups = (id: string, serviceType: string = 'db'): NavGroup[] => {
     return [
         {
             label: 'Database',
             items: [
                 {
                     title: 'Info',
-                    url: `/db/${id}/info`,
+                    url: `/${serviceType}/${id}/info`,
                     icon: 'billing',
                     isActive: false,
                     shortcut: ['d', 'd'],
@@ -114,6 +98,52 @@ export const dynamicNavGroups = (id: string): NavGroup[] => {
         },
     ]
 }
+
+export const appStaticNavGroups = (id: string): NavGroup[] => {
+    return [
+        {
+            label: 'Application',
+            items: [
+                {
+                    title: 'Info',
+                    url: `/app/${id}/info`,
+                    icon: 'billing',
+                    isActive: false,
+                    shortcut: ['d', 'd'],
+                    items: []
+                },
+            ]
+        },
+        {
+            label: 'Monitoring',
+            items: [
+                {
+                    title: 'Logs',
+                    url: ``,
+                    icon: 'logs',
+                    isActive: true,
+                    items: [
+                        {
+                            title: 'System Logs',
+                            url: `/app/${id}/logs/system`,
+                            icon: 'logs',
+                            isActive: false,
+                            items: []
+                        },
+                        {
+                            title: 'Container Logs',
+                            url: `/app/${id}/logs/container`,
+                            icon: 'logs',
+                            isActive: false,
+                            items: []
+                        }
+                    ]
+                }
+            ]
+        },
+    ]
+}
+
 export const postgreSQLNavGroups: NavGroup[] = [
     {
         label: 'PostgreSQL',

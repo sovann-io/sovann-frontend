@@ -86,7 +86,8 @@ export const DatabaseForm = ({ dbType }: DatabaseFormProps) => {
                             <div key={idx} className="grid grid-cols-1 sm:grid-cols-4 gap-4 items-center">
                                 <div>
                                     <Label className="flex items-center gap-3 text-base font-medium text-gray-900 dark:text-gray-300">
-                                        {label} <small className='text-xs'>Optional</small> 
+                                        {label} 
+                                        {/* <small className='text-xs'>Optional</small>  */}
                                     </Label>
                                     <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                                         {description}

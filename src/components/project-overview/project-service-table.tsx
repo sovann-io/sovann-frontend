@@ -12,16 +12,22 @@ import { SERVICE_TYPE } from "@/constants/misc";
 import { useRouter } from 'nextjs-toploader/app';
 import { toast } from "sonner";
 
-export default function ProjectServiceTable({ data, loading }: { data: ApplicationItem[], loading: boolean }) {
+interface ProjectServiceTable {
+    data: ApplicationItem[],
+    loading: boolean,
+    toRefresh: boolean,
+    setToRefresh: (value: boolean) => void
+}
+
+export default function ProjectServiceTable({ data, loading, toRefresh, setToRefresh }: ProjectServiceTable) {
     const router = useRouter()
     const [currentRow, setCurrentRow] = useState<ApplicationItem | null>(null)
     const [open, setOpen] = useDialogState<TableListDialogType>(null)
     const [error, setError] = useState<string>()
-    const [madeChangeLoading, setMadeChangeLoading] = useState<boolean>(false)
+
     useEffect(() => {
         async function getApplicationDetail() {
             if (open === 'view' && currentRow?.id) {
-                setMadeChangeLoading(true)
                 try {
                     currentRow?.options?.map((option: any) => {
                         if (option.key === SERVICE_TYPE) {
@@ -32,18 +38,17 @@ export default function ProjectServiceTable({ data, loading }: { data: Applicati
                 } catch (err) {
                     setError((err as any).message || 'An error occurred.');
                 }
-                setMadeChangeLoading(false)
             }
         }
         getApplicationDetail()
     }, [open === 'view'])
+
     const handleConfirmDelete = async () => {
         if (currentRow?.id) {
             try {
                 const response = await deleteAppNameById(currentRow.id)
-                console.log(response)
                 if (response.success) {
-                    router.refresh()
+                    setToRefresh(!toRefresh)
                     toast.success('Service deleted successfully')
                 }
             } catch (err) {
@@ -51,6 +56,7 @@ export default function ProjectServiceTable({ data, loading }: { data: Applicati
             }
         }
     }
+
     return (
         <TableListContextProvider value={{ open, setOpen, currentRow, setCurrentRow }}>
             {/* Table component */}

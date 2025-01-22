@@ -49,6 +49,36 @@ export const editAppNameById = async (id: string, appName: string) => {
     }
 }
 
+export const suspendApplicationById = async (id: string) => {
+    try {
+        const token = await localforage.getItem(ACCESS_TOKEN);
+        const response = await axios.post(`${API_BASE_URL}/applications/${id}/stop`, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return await response.data;
+    } catch (error) {
+        console.error("Error fetching applications", error)
+        throw error
+    }
+}
+
+export const resumeApplicationById = async (id: string) => {
+    try {
+        const token = await localforage.getItem(ACCESS_TOKEN);
+        const response = await axios.post(`${API_BASE_URL}/applications/${id}/start`, {}, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return await response.data;
+    } catch (error) {
+        console.error("Error fetching applications", error)
+        throw error
+    }
+}
+
 export const deleteAppNameById = async (id: string) => {
     try {
         const token = await localforage.getItem(ACCESS_TOKEN);

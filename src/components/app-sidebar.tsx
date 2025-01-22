@@ -99,19 +99,23 @@ export default function AppSidebar({ groups, showBackButton }: AppSidebarProps) 
               </Button>
             </div>
           )}
-          {(showBackButton && state === 'collapsed') && (
-            <div className='my-2 flex items-center justify-center text-xs text-sidebar-accent-foreground cursor-pointer'>
-              <Button variant={'ghost'} onClick={() => router.replace('/projects/overview')} className='w-full'>
-                <ArrowLeftIcon className='size-5 cursor-pointer' />
-              </Button>
-            </div>
-          )}
-          {groups.map((group) => (
+          {groups.map((group, groupIndex) => (
             <div key={group.label} className="flex flex-col my-1">
               {group.label && (
                 <SidebarGroupLabel>{group.label}</SidebarGroupLabel>
               )}
               <SidebarMenu>
+                {(showBackButton && state === 'collapsed' && groupIndex === 0) && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                      className='text-xs my-2'
+                      onClick={() => router.push('/projects/overview')}
+                    >
+                      <ArrowLeftIcon className='size-4' />
+                      Back
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
                 {group.items?.map((item) => {
                   const Icon = item.icon ? Icons[item.icon] : Icons.logo;
                   return (item?.items?.length && item?.items?.length > 0) ? (

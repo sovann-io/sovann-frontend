@@ -10,7 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Check, CircleX } from "lucide-react";
-import { dynamicNavGroups, navGroups } from "@/constants/sidebar";
+import { appStaticNavGroups, dynamicNavGroups, navGroups } from "@/constants/sidebar";
 import { EventStreamContentType, fetchEventSource } from '@/lib/sse';
 import { toast } from "sonner";
 
@@ -19,38 +19,47 @@ class FatalError extends Error { }
 
 export default function SystemLogsPage() {
     const pathname = usePathname()
-    const [connectToSSE, setConnectToSSE] = useState<boolean>(false);
-    const [connectToSSELoading, setConnectToSEELoading] = useState<boolean>(false);
+    const [connectToWS, setConnectToWS] = useState<boolean>(false);
+    const [connectToWSLoading, setConnectToWSLoading] = useState<boolean>(false);
     const [buildLogs, setBuildLogs] = useState<BuildLogItem[]>([])
+    const [socketLogs, setSocketLogs] = useState<string[]>([])
 
     const [_, type, id] = pathname.split("/")
 
     useEffect(() => {
-        async function connectToBuildLogSSE() {
-            setConnectToSEELoading(true);
+        async function connectToBuildLogWS() {
+            setConnectToWSLoading(true);
             try {
                 // Simulating WebSocket or Database connection logic
-                await fetchEventSource(`${API_BASE_URL}/stream/${id}/logs`, {
-                    async onopen(response) {
-                        if (response.ok && response.headers.get('content-type') === EventStreamContentType) {
-                            return; // everything's good
-                        } else if (response.status >= 400 && response.status < 500 && response.status !== 429) {
-                            // client-side errors are usually non-retriable:
-                            throw new FatalError();
-                        } else {
-                            throw new RetriableError();
-                        }
-                    },
-                    onmessage(ev) {
-                        console.log(ev.data);
-                        toast.success("New log received");
-                    }
-                });
-                setConnectToSSE(true);
+                const socket = new WebSocket(`ws://localhost:8000/ws/logs/${id}`);
+                // Event listener for when 
+                //the WebSocket connection is opened
+                socket.onopen = function (event) {
+                    // Alert the user that they are 
+                    // connected to the WebSocket server
+                    alert('You are Connected to WebSocket Server');
+                };
+
+                // Event listener for when a message
+                //  is received from the server
+                socket.onmessage = function (event) {
+                    // Log the message from the server
+                    console.log('Message:', event.data);
+                    setSocketLogs([...socketLogs, event.data]);
+                };
+
+                // Event listener for when the 
+                // WebSocket connection is closed
+                socket.onclose = function (event) {
+                    // Log a message when disconnected
+                    //  from the WebSocket server
+                    console.log('Disconnected from WebSocket server');
+                };
+                setConnectToWS(true);
             } catch (error) {
                 console.error("Connection failed:", error);
             } finally {
-                setConnectToSEELoading(false);
+                setConnectToWSLoading(false);
             }
         }
 
@@ -61,21 +70,21 @@ export default function SystemLogsPage() {
                 setBuildLogs(data.data);
             }
         }
-        if (connectToSSE) {
-            connectToBuildLogSSE();
+        if (connectToWS) {
+            connectToBuildLogWS();
         } else {
             connectToBuildLogDB()
         }
-    }, [connectToSSE]);
+    }, [connectToWS]);
 
     return (
-        <DashboardPage groups={dynamicNavGroups(id)} showBackButton={true}>
+        <DashboardPage groups={appStaticNavGroups(id)} showBackButton={true}>
             <div className="grid space-y-4">
                 <div className="flex justify-between items-center py-1">
                     <h1 className="text-2xl">System Logs</h1>
-                    {/* {connectToSSELoading ? (
+                    {/* {connectToWSLoading ? (
                         <span className="text-gray-500">Connecting...</span>
-                    ) : connectToSSE ? (
+                    ) : connectToWS ? (
                         <span className="text-green-500">Connected</span>
                     ) : (
                         <span className="text-red-500">Disconnected</span>
@@ -83,14 +92,14 @@ export default function SystemLogsPage() {
                     <div className="flex items-center space-x-4">
                         <Checkbox
                             id="logs-check"
-                            checked={!connectToSSE}
-                            onCheckedChange={() => setConnectToSSE(!connectToSSE)}
+                            checked={!connectToWS}
+                            onCheckedChange={() => setConnectToWS(!connectToWS)}
                         />
                         <Label htmlFor="logs-check" className="ml-2">Get logs from database</Label>
                     </div>
                 </div>
             </div>
-            {!connectToSSE && (
+            {!connectToWS && (
                 <>
                     {buildLogs.length === 0 && <div className="text-lg text-center text-gray-400">No logs available</div>}
                     <Accordion type="multiple" className="w-full" defaultValue={["items-0"]}>
@@ -135,6 +144,13 @@ export default function SystemLogsPage() {
                             </AccordionItem>
                         ))}
                     </Accordion>
+                </>
+            )}
+            {connectToWS && (
+                <>
+                    {socketLogs.map((log, index) => (
+                        <div key={index} className="text-green-500">{log}</div>
+                    ))}
                 </>
             )}
         </DashboardPage >
